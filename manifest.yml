@@ -1,0 +1,10 @@
+applications:
+- path: .
+  memory: 256M
+  instances: 1
+  domain: mybluemix.net
+  name: bot-telegram-paulo-valadares
+  host: bot-telegram-paulo-valadares
+  disk_quota: 1024M
+  services:
+  - Speech To Text-4n
