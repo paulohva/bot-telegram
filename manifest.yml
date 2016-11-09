@@ -7,4 +7,5 @@ applications:
   host: bot-telegram-paulo-valadares
   disk_quota: 1024M
   services:
-  - Speech To Text-4n
+  - Speech To Text-p6
+  - Conversation-8i
