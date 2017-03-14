@@ -15,11 +15,11 @@ var params = {
   interim_results: false
 };
 var conversation = watson.conversation({
-  url: 'https://gateway.watsonplatform.net/conversation/api',
-  username: '308f8166-3fcb-42b4-973d-326e8401af90',
-  password: 'JY7u48JsuR6i',
-  version_date: '2016-07-11',
-  version: 'v1'
+	url: 'https://gateway.watsonplatform.net/conversation/api',
+	username: '308f8166-3fcb-42b4-973d-326e8401af90',
+	password: 'JY7u48JsuR6i',
+	version_date: '2016-07-11',
+	version: 'v1'
 });
 var conversation_id = '';
 var context = {};
@@ -27,51 +27,32 @@ var bot = new Bot('273517451:AAHiieomrFzaZcJyOpw7Y6h0gfBYiJ_NFeU', { polling: tr
 bot.on('message', function (msg) {
 	if(msg['voice']){ return onVoiceMessage(msg); }
 });
-function onVoiceMessage(msg) {
-  var chatId = msg.chat.id;
-  bot.getFileLink(msg.voice.file_id).then(function(link) {
-    //setup new recognizer stream
-    var recognizeStream = speech_to_text.createRecognizeStream(params);
-    recognizeStream.setEncoding('utf8');
-    recognizeStream.on('results', function(data) {
-      if (data && data.results && data.results.length > 0 && data.results[0].alternatives && data.results[0].alternatives.length > 0) {
-        var result = data.results[0].alternatives[0].transcript;
-        console.log("result: ", result);
-        
-        //send speech to Watson Conversation
-        var payload = {
-          workspace_id: '27dba7a0-1922-4e83-86da-1334bdcf765b',
-          input: {'text': result},
-          context: context
-        };
-        conversation.message(payload,  function(err, response) {
-          if (err)
-            console.log('error:', err);
-          else {
-            console.log(JSON.stringify(response, null, 2));
-            conversation_id = (response.context.conversation_id);
-            context = response.context;
-            console.log(response.output.text[0]);
-            if (response.output.text[0] != '500') {
-              bot.sendMessage(chatId, response.output.text[0], {
-                disable_notification: true,
-                reply_to_message_id: msg.message_id
-              }).then(function() {
-                // reply sent!
-                console.log('reply sent');
-              });
-            }
-          }
-            //send speech recognizer result back to chat
-              } );
-      }
-    });
-    ['data', 'error', 'connection-close'].forEach(function(eventName) {
-      recognizeStream.on(eventName, console.log.bind(console, eventName + ' event: '));
-    });
-    //pipe voice message to recognizer -> send to watson
-    request(link).pipe(recognizeStream);
-  });
+function onVoiceMessage(msg){
+	var chatId = msg.chat.id;
+	bot.getFileLink(msg.voice.file_id).then(function(link){
+ //setup new recognizer stream
+ var recognizeStream = speech_to_text.createRecognizeStream(params);
+ recognizeStream.setEncoding('utf8');
+ recognizeStream.on('results', function(data){
+ 	if(data && data.results && data.results.length>0 && data.results[0].alternatives && data.results[0].alternatives.length>0){
+ 		var result = data.results[0].alternatives[0].transcript;
+ 		console.log("result: ", result);
+ //send speech recognizer result back to chat
+ bot.sendMessage(chatId, result, {
+ 	disable_notification: true,
+ 	reply_to_message_id: msg.message_id
+ }).then(function () {
+ // reply sent!
+});
+}
+
+});
+ ['data', 'error', 'connection-close'].forEach(function(eventName){
+ 	recognizeStream.on(eventName, console.log.bind(console, eventName + ' event: '));
+ });
+ //pipe voice message to recognizer -> send to watson
+ request(link).pipe(recognizeStream);
+});
 }
 /*eslint-env node*/
 //------------------------------------------------------------------------------
